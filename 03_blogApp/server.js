@@ -17,7 +17,7 @@ app.use("/api/v1", blogRoutes);
 
 // start server
 app.listen(Port, () => {
-  console.log("Server Started");
+  console.log(`Server Started at Port no. ${Port}`);
 });
 
 // connect to DB

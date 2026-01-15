@@ -5,7 +5,12 @@ require("dotenv").config();
 exports.auth = (req, res, next) => {
   try {
     // extract JWT Token
-    const { token } = req.body;
+    console.log("Cookies ==> ", req.cookies.token);
+
+    const token =
+      req.body.token ||
+      req.cookies.token 
+      req.header("Authorization").replace("Bearer ", "");
 
     if (!token) {
       return res.status(401).json({
@@ -15,7 +20,6 @@ exports.auth = (req, res, next) => {
     }
 
     // Verfiy the token
-
     try {
       const payload = jwt.verify(token, process.env.JWT_SECRET);
       console.log(payload);

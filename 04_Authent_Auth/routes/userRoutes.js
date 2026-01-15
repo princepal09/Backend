@@ -14,6 +14,13 @@ router.get("/student", auth, isStudent, (req, res) => {
   });
 });
 
+router.get("/test", auth, (req, res) => {
+  res.json({
+    success: true,
+    message: "Welcome to the Protected Route For Students",
+  });
+});
+
 router.get("/admin", auth, isAdmin, (req, res) => {
   res.json({
     success: true,

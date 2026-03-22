@@ -1,40 +1,42 @@
-import mongoose  from "mongoose";
+import mongoose from "mongoose";
+import bcrypt from "bcrypt";
 
-export const userSchema = new mongoose.Schema({
-
-    firstname : {
-        type : String,
-        required : [true, "First Name is required"],
-        trim : [true, "First Name must be trimmed"],
+const userSchema = new mongoose.Schema({
+    firstname: {
+        type: String,
+        required: [true, "First Name is required"],
+        trim: true,
     },
-    lastname :{
-        type : String,
-        required : [true, "Last Name is required"],
-        trim : [true, "Last Name must be trimmed"],
+    lastname: {
+        type: String,
+        required: [true, "Last Name is required"],
+        trim: true,
     },
-    email : {
-        type : String,
-        required : [true, "Email is required"],
-        unique : [true, "Email must be unique"],
-        lowercase : [true, "Email must be in lowercase"],
-        trim : [true, "Email must be trimmed"],
-        match : [/\S+@\S+\.\S+/, "Email is invalid"]
+    email: {
+        type: String,
+        required: [true, "Email is required"],
+        unique: true,
+        lowercase: true,
+        trim: true,
+        match: [/\S+@\S+\.\S+/, "Email is invalid"],
     },
+    password: {
+        type: String,
+        required: [true, "Password is required"],
+    }
+}, { timestamps: true });
 
-    password : {
-        type : String,
-        required : [true, "Password is required"],
-    },
-    
-    confirmPassword : {
-        type : String,
-        required : [true, "Confirm Password is required"],
-    },
+userSchema.pre("save", async function(){
+    if(!this.isModified("password")) return;
+    const hash = await bcrypt.hash(this.password, 10);
+    this.password = hash;
+}
+)
+
+userSchema.methods.comparePassword = async(password) =>{
+    return await bcrypt.compare(password, this.password);
+
+}
 
 
-
-
-},{timestamps : true})
-
-
-module.exports = mongoose.model("User", userSchema)
+export const User =  mongoose.model("User", userSchema);

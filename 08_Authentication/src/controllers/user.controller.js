@@ -2,7 +2,7 @@ import { User } from "../models/user.model.js";
 import { OTP } from "../models/otp.model.js";
 import otpGenerator from "otp-generator"
 import { sendVerificationMail } from "../mail/mailTypes.js";
-
+import bcrypt from 'bcrypt'
 export const sendOtp = async (req, res) => {
     try {
         const { email } = req.body;
@@ -13,19 +13,33 @@ export const sendOtp = async (req, res) => {
             })
         }
 
-        await OTP.deleteMany({email})
+        const isUserExists = await User.findOne({ email });
+        if (isUserExists) {
+            return res.status(400).json({
+                success: false,
+                message: "User already exists. Please log in to continue"
+            })
+        }
 
-        const otp =  otpGenerator.generate(6, { upperCaseAlphabets: false, lowerCaseAlphabets: false, specialChars: false });
+        const otp = otpGenerator.generate(6, { upperCaseAlphabets: false, lowerCaseAlphabets: false, specialChars: false });
+
+        const hashOtp = await bcrypt.hash(otp, 10)
+
+        await OTP.findOneAndUpdate({ email }, {
+            $set: {
+                email,
+                otp: hashOtp,
+                createdAt: Date.now()
+            }
+        }, { upsert: true, returnDocument: "after" },)
+
 
         await sendVerificationMail(email, otp);
 
-        await OTP.create({
-           email, otp
-        })
 
         return res.status(200).json({
-                success : true,
-                message : "Successfully sent OTP to your mail"
+            success: true,
+            message: "Successfully sent OTP to your mail"
         })
 
 

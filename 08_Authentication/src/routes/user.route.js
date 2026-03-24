@@ -7,7 +7,7 @@ const router = Router();
  * /api/v1/auth/signup
  */
 router.post("/signup", signUp)
-router.post("/verify-email", sendOtp)
+router.post("/send-otp", sendOtp)
 
 
 

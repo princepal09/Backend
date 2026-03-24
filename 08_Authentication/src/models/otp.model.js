@@ -6,7 +6,8 @@ const otpSchema = new mongoose.Schema({
         type : String,
         required : true,
         trim : true,
-        index : true
+        index : true,
+        unique : true
     },
     otp : {
         type :String,
@@ -16,16 +17,16 @@ const otpSchema = new mongoose.Schema({
         type : Date,
         default : Date.now,
         expires : 5 * 60 
-    }
+    },
 })
 
-otpSchema.pre("save", async function () {
-    if(!this.isModified("otp")){
-        return;
-    }
-    const otpHash = await bcrypt.hash(this.otp, 10);
-    this.otp = otpHash
-})
+// otpSchema.pre("save", async function () {
+//     if(!this.isModified("otp")){
+//         return;
+//     }
+//     const otpHash = await bcrypt.hash(this.otp, 10);
+//     this.otp = otpHash
+// })
 
 
 

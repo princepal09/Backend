@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { apiConnector } from "../services/apiConnector";
 import { END_POINTS } from "../services/api";
@@ -8,7 +8,7 @@ const ChatBot = () => {
     register,
     handleSubmit,
     reset,
-    formState: { errors },
+    formState: { errors, isSubmitting, isSubmitSuccessful },
   } = useForm();
 
   const [data, setData] = useState("");
@@ -28,8 +28,13 @@ const ChatBot = () => {
 
   const submitHandler = async (data) => {
     await fetchData(data);
-    reset();
   };
+
+  useEffect(() => {
+    if (isSubmitSuccessful) {
+      reset();
+    }
+  }, [isSubmitSuccessful, reset]);
 
   return (
     <div className="min-h-screen bg-linear-to-br from-gray-900 to-gray-800 flex items-center justify-center px-4">
@@ -62,7 +67,7 @@ const ChatBot = () => {
               type="submit"
               className="self-end px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition"
             >
-              Generate
+              {isSubmitting ? "Submitting..." : "Submit"}
             </button>
           </form>
 

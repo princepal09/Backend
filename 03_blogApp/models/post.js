@@ -9,7 +9,7 @@ const postSchema = new mongoose.Schema({
   body: {
     type: String,
     required: true,
-    maxLength: 500,
+    maxLength: 50,
   },
   likes: [
     {

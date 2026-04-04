@@ -4,7 +4,7 @@ const router = express.Router();
 
 // import Controller
 
-const{createPost, getAllPosts} = require('../controllers/postController')
+const{createPost, getAllPosts, getPost} = require('../controllers/postController')
 const{createComment} = require("../controllers/commentController") 
 const {dummyRoute} = require("../controllers/dummyController")
 const {likePost, unlikePost} = require("../controllers/likeController")
@@ -15,5 +15,6 @@ router.post('/comments/create',createComment)
 router.get('/dummyRoute',dummyRoute)
 router.post('/likes/like',likePost)
 router.post('/likes/unlike',unlikePost)
+router.get('/posts/post/:id',getPost)
 
 module.exports = router

@@ -2,47 +2,80 @@ const Post = require("../models/post");
 
 exports.createPost = async (req, res) => {
   try {
-    // extract title, body, likes and comments from request body
-    const { title, body, likes, comments } = req.body;
-    const post = await Post.create({ title, body, likes, comments });
+    // data fetch from request body
+    const { title, body } = req.body;
 
-    // send a json response with a success flag
+    // check the title and body is empty or not
+    if (!title || !body) {
+      return res.status(404).json({
+        success: false,
+        message: "All Fields Required!!",
+      });
+    }
+    // Create Post
+    const post = await Post.create({ title, body });
 
-    res.status(200).json({
+    // Return res
+
+    return res.status(201).json({
       success: true,
-      data: post,
-      message: "Post Created Successfully",
+      message: "Created a Post",
+      post: post,
     });
   } catch (err) {
     console.log(err);
-    console.error(err);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
-      data: "Internal Server Error",
-      message: err.message,
+      message: "Internal Server Error",
     });
   }
 };
 
 
-exports.getAllPosts = async (req, res) =>{
-    try{
+exports.getPost = async (req, res) => {
+  try {
+  
+    const {id} = req.params
+    const post = await Post.findById(id)
 
-        const posts = await Post.find().populate("comments").populate("likes").exec();
+    if(!post){
+      return res.status(404).json({
+        success : false,
+        message : "Post Not Found"
+      })
+    }
 
-        res.status(200).json({
-            success:true,
-            data : posts
-        })
-
-    }catch (err) {
+    // Return res
+    return res.status(200).json({
+      success: true,
+      message: " Post Fetched successfully",
+       post,
+    });
+  } catch (err) {
     console.log(err);
-    console.error(err);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
-      data: "Internal Server Error",
-      message: err.message,
+      message: "Internal Server Error",
     });
   }
+};
 
-}
+exports.getAllPosts = async (req, res) => {
+  try {
+  
+    const post = await Post.find().populate("likes").populate("comments").exec();
+
+    // Return res
+    return res.status(201).json({
+      success: true,
+      message: "Fetched all post successfully",
+      post: post,
+    });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+};

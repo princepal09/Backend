@@ -6,28 +6,31 @@ require("dotenv").config();
 exports.signUpController = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
-
-    const exisitingUser = await User.findOne({ email });
-
-    if (exisitingUser) {
-      return res.status(400).json({
+    if (!name || !email || !password || !role) {
+      return res.status(404).json({
         success: false,
-        message: "User Already Exists",
+        message: "All Fields are required !!",
       });
     }
 
-    // secure password
+    const exitisingUser = await User.findOne({ email });
+    if (exitisingUser) {
+      return res.status(400).json({
+        success: false,
+        message: "User  already exists ",
+      });
+    }
+
     let hashedPassword;
     try {
       hashedPassword = await bcrypt.hash(password, 10);
     } catch (err) {
-      return res.status(500).json({
+      return res.status(400).json({
         success: false,
-        message: "Error in hashing password",
+        message: "Error in Hashing Password",
       });
     }
 
-    // Create entry for user
     const userData = await User.create({
       name,
       email,
@@ -37,22 +40,20 @@ exports.signUpController = async (req, res) => {
 
     userData.password = undefined;
 
-    console.log(userData);
-
-    return res.status(201).json({
+    return res.status(200).json({
       success: true,
-      message: "User Created Successfull",
-      data: userData,
+      userData,
+      message: "User Registered Successfully!!",
     });
   } catch (err) {
-    console.log(err);
-    return res.status(500).json({
+    res.status(500).json({
       success: false,
-      error: false,
-      message: err.message,
+      message: "Internal Server Error",
+      error: err.message,
     });
   }
 };
+
 
 exports.login = async (req, res) => {
   try {
@@ -90,8 +91,7 @@ exports.login = async (req, res) => {
       });
 
       user.password = undefined;
-      user.token = token;
-
+      user.token = token
       const options = {
         expires: new Date(Date.now() + 30000),
         httpOnly: true,
@@ -118,3 +118,4 @@ exports.login = async (req, res) => {
     });
   }
 };
+

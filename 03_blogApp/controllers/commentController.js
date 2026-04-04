@@ -1,38 +1,38 @@
-const Post = require("../models/post");
+const Post = require('../models/post')
 const Comment = require('../models/comments')
 
-exports.createComment = async (req, res) => {
-  try {
-    const { user, post, body } = req.body;
-    const comment = new Comment({
-      post,
-      user,
-      body,
-    });
+exports.createComment = async(req, res) =>{
+  try{
+    const {commentBody, user, post} = req.body
+     // check the title and body is empty or not
+    if (!commentBody || !user || !post) {
+      return res.status(404).json({
+        success: false,
+        message: "All Fields Required!!",
+      });
+    }
 
+    // create Comment 
+    const comment = new Comment ({commentBody, user, post})
     const savedComment = await comment.save();
+    
+    const updatedPost = await Post.findByIdAndUpdate(post, {$push:{comments : savedComment._id }},{new:true}).populate("comments").exec();
+                       
 
-    // find the post by ID, add the new comments to its comments array
-    const updatedPost = await Post.findByIdAndUpdate(
-      post,
-      { $push: { comments: savedComment._id } },
-      { new: true }
-    )
-      .populate("comments")
-      .exec();
+    return res.status(201).json({
+      success : true,
+      message : "Your Comment has created",
+      comment : savedComment
+    })
 
-    res.status(200).json({
-      success: true,
-      data: updatedPost,
-      message: "Succefully Created Comment",
-    });
-  } catch (err) {
+
+  }catch (err) {
     console.log(err);
-    console.error(err);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
-      data: err.message,
-      message: "Internal server error",
+      message: "Internal Server Error",
+      error : err.message
     });
   }
-};
+
+}

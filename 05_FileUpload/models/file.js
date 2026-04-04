@@ -25,7 +25,7 @@ const transporter = require("../config/nodemailer");
 
 fileSchema.post("save", async function (doc) {
   try {
-    // send mail 
+    // send mail
     let info = await transporter.sendMail({
       from: `"Prince Pal" <${process.env.MAIL_USER}>`,
       to: doc.email,
@@ -41,6 +41,5 @@ fileSchema.post("save", async function (doc) {
     console.log("Mail error:", err.message);
   }
 });
-
 
 module.exports = mongoose.model("File", fileSchema);

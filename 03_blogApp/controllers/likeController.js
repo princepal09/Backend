@@ -1,62 +1,58 @@
-const Post = require("../models/post");
 const Like = require("../models/like");
+const Post = require("../models/post");
 
-// Like Post
 exports.likePost = async (req, res) => {
   try {
     const { post, user } = req.body;
-    const likePost = await Like.create({
-      post,
-      user,
-    });
+
+    const savedLike = await Like.create({ post, user });
 
     const updatedPost = await Post.findByIdAndUpdate(
       post,
-      { $push: { likes: likePost._id } },
-      { new: true }
-    ).populate("likes") .exec();
-    res.json({  
-        success : true,
-      data: updatedPost,
+      { $push: { likes: savedLike._id } },
+      { new: true },
+    )
+      .populate("likes")
+      .exec();
+
+    return res.status(201).json({
+      status: true,
+      message: "Liked",
+      likes: updatedPost,
     });
   } catch (err) {
     console.log(err);
-    console.error(err);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
-      data: err.message,
-      message: "Error While Liking Post",
+      message: "Internal Server Error",
+      error: err.message,
     });
   }
 };
 
-// Unlike Post
 exports.unlikePost = async (req, res) => {
   try {
+    const { post, like } = req.body;
 
-    const {post, like} = req.body;
-    // find and delete the like in collection 
+    const deletedLike = await Like.findOneAndDelete({ post: post, _id: like });
 
-    const deletedLike = await Like.findOneAndDelete({post:post, _id:like})
+    const updatedPost = await Post.findByIdAndUpdate(
+      post,
+      { $pull: { likes: deletedLike._id } },
+      { new: true },
+    );
 
-
-    // update the post collection 
-    const updatedPost = await Post.findByIdAndUpdate(post,{$pull :{likes:deletedLike._id}}, {new : true})
-
-    res.json({
-        success : true, 
-        post:updatedPost
-    })
-
-
-
+    return res.status(201).json({
+      status: true,
+      message: "Unliked",
+      likes: updatedPost,
+    });
   } catch (err) {
     console.log(err);
-    console.error(err);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
-      data: err.message,
-      message: "Error while Unliking Post",
+      message: "Internal Server Error",
+      error: err.message,
     });
   }
 };

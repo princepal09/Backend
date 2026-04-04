@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { apiConnector } from "../services/apiConnector";
 import { END_POINTS } from "../services/api";
+import Spinner from "./Spinner";
+import ReactMarkdown from "react-markdown";
+
 
 const ChatBot = () => {
   const {
@@ -18,7 +21,7 @@ const ChatBot = () => {
       const response = await apiConnector("POST", END_POINTS.GEMINI_AI_API, {
         prompt: data.prompt,
       });
-      
+
       console.log("API Response:", response.data);
       setData(response.data.data);
     } catch (error) {
@@ -28,6 +31,7 @@ const ChatBot = () => {
 
   const submitHandler = async (data) => {
     await fetchData(data);
+    console.log(isSubmitting);
   };
 
   useEffect(() => {
@@ -75,7 +79,7 @@ const ChatBot = () => {
           <div className="bg-gray-900 border overflow-y-scroll border-gray-700 rounded-lg p-4 h-75 text-gray-300">
             <p className="text-sm text-gray-400 mb-2">Response:</p>
             {/* Response will appear here */}
-            {data}
+            {isSubmitting ? <Spinner /> : <ReactMarkdown>{data}</ReactMarkdown>}
           </div>
         </div>
       </div>

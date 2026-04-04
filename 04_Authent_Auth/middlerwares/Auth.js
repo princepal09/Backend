@@ -5,12 +5,10 @@ require("dotenv").config();
 exports.auth = (req, res, next) => {
   try {
     // extract JWT Token
-    console.log("Cookies ==> ", req.cookies.token);
+    // console.log("Cookies ==> ", req.cookies.token);
 
-    const token =
-      req.body.token ||
-      req.cookies.token 
-      req.header("Authorization").replace("Bearer ", "");
+    const token = req.cookies.token || req.body.token || req.header("Authorization").replace("Bearer ","") 
+      
 
     if (!token) {
       return res.status(401).json({
@@ -23,7 +21,7 @@ exports.auth = (req, res, next) => {
     try {
       const payload = jwt.verify(token, process.env.JWT_SECRET);
       console.log(payload);
-      req.user = payload;
+      req.user = payload
     } catch (err) {
       return res.status(401).json({
         success: false,
@@ -36,9 +34,12 @@ exports.auth = (req, res, next) => {
     return res.status(401).json({
       success: false,
       message: "Something went Wrong, While verifying the token",
+      error : err.message
     });
   }
 };
+
+
 
 exports.isStudent = (req, res, next) => {
   try {

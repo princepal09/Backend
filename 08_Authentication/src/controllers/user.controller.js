@@ -3,6 +3,8 @@ import { OTP } from "../models/otp.model.js";
 import otpGenerator from "otp-generator"
 import { sendVerificationMail } from "../mail/mailTypes.js";
 import bcrypt from 'bcrypt'
+
+
 export const sendOtp = async (req, res) => {
     try {
         const { email } = req.body;
@@ -58,43 +60,64 @@ export const sendOtp = async (req, res) => {
 
 export const signUp = async (req, res) => {
     try {
-        const { firstname, lastname, email, password, confirmPassword } = req.body;
+        const { firstname, lastname, email, otp, password, confirmPassword } = req.body;
 
-        if (!firstname || !lastname || !email || !password || !confirmPassword) {
+        if (!firstname || !lastname || !email || !password || !confirmPassword || !otp) {
             return res.status(400).json({
                 success: false,
                 message: "All fields are required"
             })
         }
+
         if (password !== confirmPassword) {
             return res.status(400).json({
                 success: false,
-                message: "Password and Confirm Password must be same"
+                message: "Password and Confirm Password should be same"
             })
         }
 
-        const existingUser = await User.findOne({ email });;
-        if (existingUser) {
+        const isExists = await User.findOne({ email });
+        if (isExists) {
             return res.status(400).json({
                 success: false,
-                message: "User already exists with this email"
+                message: "User already exists. Please log in to continue"
             })
         }
+
+        const recentOtp = await OTP.findOne({ email }).sort({ createdAt: -1 })
+
+        // OTP not found for this email
+        if (!recentOtp) {
+            return res.status(400).json({
+                success: false,
+                message: "The OTP is not valid because otp data is empty for this email",
+            })
+        }
+
+        const isMatch = await bcrypt.compare(otp.toString(), recentOtp.otp);
+
+
+        if (!isMatch) {
+            return res.status(400).json({
+                success: false,
+                message: "The OTP is not valid"
+            })
+        }
+
+
         const user = await User.create({
-            firstname,
-            lastname,
-            password,
-            email
+            email, firstname, lastname, password,
         })
+
+        user.password = undefined
+
+        await OTP.deleteOne({ email })
 
         return res.status(201).json({
             success: true,
-            message: "User created successfully",
-            user,
+            message: "User signup successfully",
+            user
         })
-
-
-
     } catch (err) {
         console.error(err.message);
         return res.status(500).json({

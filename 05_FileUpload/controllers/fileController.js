@@ -24,7 +24,6 @@ exports.localFileUpload = async(req, res) =>{
       }
 }  
 
-
 function isFileTypeSupported(types, filetype){
   return types.includes(filetype);
 }
@@ -36,7 +35,7 @@ async function uploadCloudinary(file,folder, quality){
   if(quality){
     options.quality = quality;
   }
-
+   
  return  await cloudinary.uploader.upload(file.tempFilePath, options)
 
 }

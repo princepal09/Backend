@@ -1,4 +1,5 @@
 import { uploadOnCloudinary } from "../utils/cloudinary/cloudinary.js";
+import User from "../models/form.model.js"
 
 export const contactController = async (req, res) => {
 
@@ -23,6 +24,11 @@ export const contactController = async (req, res) => {
             });
         }
 
+        await User.create({
+            name, email, message,
+            file: result.secure_url
+        })
+
         return res.status(200).json({
             success: true,
             message: "Contact form submitted successfully",
@@ -30,7 +36,7 @@ export const contactController = async (req, res) => {
                 name,
                 email,
                 message,
-                fileUrl : result.secure_url,
+                fileUrl: result.secure_url,
             }
 
         });

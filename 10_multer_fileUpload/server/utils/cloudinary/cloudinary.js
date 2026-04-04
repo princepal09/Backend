@@ -3,7 +3,7 @@ import fs from 'fs'
 import dotenv from 'dotenv'
 dotenv.config()
 
-export const cloudinarConnect = () => {
+export const cloudinaryConnect = () => {
     try {
         cloudinary.config({
             cloud_name: process.env.CLOUD_NAME,

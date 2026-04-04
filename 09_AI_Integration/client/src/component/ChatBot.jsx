@@ -5,7 +5,6 @@ import { END_POINTS } from "../services/api";
 import Spinner from "./Spinner";
 import ReactMarkdown from "react-markdown";
 
-
 const ChatBot = () => {
   const {
     register,
@@ -18,12 +17,12 @@ const ChatBot = () => {
 
   const fetchData = async (data) => {
     try {
-      const response = await apiConnector("POST", END_POINTS.GEMINI_AI_API, {
-        prompt: data.prompt,
+      const response = await apiConnector("POST", END_POINTS.OLLAMA_API, {
+        message: data.prompt,
       });
 
       console.log("API Response:", response.data);
-      setData(response.data.data);
+      setData(response.data.message);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -31,7 +30,6 @@ const ChatBot = () => {
 
   const submitHandler = async (data) => {
     await fetchData(data);
-    console.log(isSubmitting);
   };
 
   useEffect(() => {

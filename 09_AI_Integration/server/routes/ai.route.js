@@ -1,9 +1,9 @@
 import express from 'express'
-import { ai } from '../controllers/ai.controller.js';
+import { chatController } from '../controllers/chat.controller.js';
 const router = express.Router();
 
 
-router.post("/ai", ai)
+router.post("/chat", chatController)
 
 
 

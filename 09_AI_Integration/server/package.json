@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev" : "node --watch index.js"
+     "dev": "concurrently \"ollama run phi\" \"node --watch index.js\""
   },
   "keywords": [],
   "author": "",
@@ -13,8 +13,11 @@
   "description": "",
   "dependencies": {
     "@google/genai": "^1.48.0",
+    "@langchain/community": "^0.0.57",
+    "concurrently": "^9.2.1",
     "cors": "^2.8.6",
     "dotenv": "^17.4.0",
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "langchain": "^0.1.36"
   }
 }

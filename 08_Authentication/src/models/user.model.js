@@ -23,22 +23,22 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         required: [true, "Password is required"],
-        select : false
+        select: false   
     },
-   
+
 }, { timestamps: true });
 
-userSchema.pre("save", async function(){
-    if(!this.isModified("password")) return;
+userSchema.pre("save", async function () {
+    if (!this.isModified("password")) return;
     const hash = await bcrypt.hash(this.password, 10);
     this.password = hash;
 }
 )
 
-userSchema.methods.comparePassword = async function(password){
-    return await bcrypt.compare(password, this.password);
+userSchema.methods.comparePassword = async function (password) {
 
+    return await bcrypt.compare(password, this.password);
 }
 
 
-export const User =  mongoose.model("User", userSchema);
+export const User = mongoose.model("User", userSchema);

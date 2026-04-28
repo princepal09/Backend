@@ -142,10 +142,12 @@ export const login = async (req, res) => {
             })
         }
 
-        const user = await User.findOne({ email })
+
+        const user = await User.findOne({ email }).select("+password")
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
+
 
         const isMatchPwd = await user.comparePassword(password);
         if (!isMatchPwd) {
@@ -154,6 +156,7 @@ export const login = async (req, res) => {
                 message: "Invalid credentials"
             })
         }
+
 
         // access token generates
         const accessToken = jwt.sign({ id: user._id },
@@ -175,7 +178,7 @@ export const login = async (req, res) => {
             maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
         })
 
-        res.status(201).jsno({
+        res.status(201).json({
             message: "User Login successfully",
             accessToken
         })
@@ -185,7 +188,10 @@ export const login = async (req, res) => {
         console.error(err.message);
         return res.status(500).json({
             status: false,
-            message: "Server Error"
+            message: "Server Error",
+            error: err.message
         })
     }
 }
+
+export const 

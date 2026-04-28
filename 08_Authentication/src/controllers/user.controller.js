@@ -3,6 +3,8 @@ import { OTP } from "../models/otp.model.js";
 import otpGenerator from "otp-generator"
 import { sendVerificationMail } from "../mail/mailTypes.js";
 import bcrypt from 'bcrypt'
+import jwt from 'jsonwebtoken'
+import { config } from "../config/config.js";
 
 
 export const sendOtp = async (req, res) => {
@@ -127,5 +129,63 @@ export const signUp = async (req, res) => {
         })
 
 
+    }
+}
+
+export const login = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        if (!email || !password) {
+            return res.status(400).json({
+                status: false,
+                message: "All fields are required"
+            })
+        }
+
+        const user = await User.findOne({ email })
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        const isMatchPwd = await user.comparePassword(password);
+        if (!isMatchPwd) {
+            return res.status(401).json({
+                status: false,
+                message: "Invalid credentials"
+            })
+        }
+
+        // access token generates
+        const accessToken = jwt.sign({ id: user._id },
+            config.JWT_SECRET,
+            {
+                expiresIn: '15m'
+            })
+
+        // refresh Token generates
+
+        const refreshToken = jwt.sign({ id: user._id }, config.JWT_SECRET, {
+            expiresIn: '7d'
+        })
+
+        res.cookie("refreshToken", refreshToken, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "strict",
+            maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+        })
+
+        res.status(201).jsno({
+            message: "User Login successfully",
+            accessToken
+        })
+
+
+    } catch (err) {
+        console.error(err.message);
+        return res.status(500).json({
+            status: false,
+            message: "Server Error"
+        })
     }
 }

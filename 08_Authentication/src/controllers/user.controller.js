@@ -5,6 +5,7 @@ import { sendVerificationMail } from "../mail/mailTypes.js";
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import { config } from "../config/config.js";
+import { Session } from "../models/session.model.js";
 
 
 export const sendOtp = async (req, res) => {
@@ -157,19 +158,31 @@ export const login = async (req, res) => {
             })
         }
 
-
-        // access token generates
-        const accessToken = jwt.sign({ id: user._id },
-            config.JWT_SECRET,
-            {
-                expiresIn: '15m'
-            })
-
         // refresh Token generates
 
         const refreshToken = jwt.sign({ id: user._id }, config.JWT_SECRET, {
             expiresIn: '7d'
         })
+
+        const refreshTokenHash = await bcrypt.hash(refreshToken, 10)
+
+        const session = await Session.create({
+            user : user._id,
+            refreshTokenHash,
+            ip : req.ip,
+            userAgent : req.headers["user-agent"]
+
+        })
+
+    
+        // access token generates
+        const accessToken = jwt.sign({ id: user._id, sessionId : session._id},
+            config.JWT_SECRET,
+            {
+                expiresIn: '15m'
+            })
+
+
 
         res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
@@ -194,4 +207,53 @@ export const login = async (req, res) => {
     }
 }
 
-export const 
+export const refreshToken = async (req, res) => {
+    try {
+        const refreshToken = req.cookies.refreshToken
+        if (!refreshToken) {
+            return res.status(404).json({
+                status: false,
+                message: "Refresh Token is mandatory"
+            })
+        }
+
+        const decoded = jwt.verify(refreshToken, config.JWT_SECRET)
+        const accessToken = jwt.sign({
+            id: decoded._id
+        },
+            config.JWT_SECRET,
+            {
+                expiresIn: '15m'
+            }
+        )
+
+        const newRefreshToken = jwt.sign({ id: decoded._id }, config.JWT_SECRET, { expiresIn: '7d' })
+
+        res.cookie('refreshToken', newRefreshToken, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "strict",
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        })
+
+        return res.status(200).json({
+            message: "Access Token Refreshed Succesfully",
+            accessToken
+        })
+
+    } catch (err) {
+        console.error(err.message)
+        return res.status(500).json({
+            success: false,
+            message: err.message
+        })
+    }
+}
+
+export const logout = async(req, res) =>{
+    try{
+
+    }catch(err){
+        
+    }
+}

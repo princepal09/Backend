@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { MONGO_URI } from "../secrets";
 
 
-export const connecDb = async():Promise<void> =>{
+export const connectDb = async():Promise<void> =>{
     try{
          await mongoose.connect(MONGO_URI);
          console.log("DB CONNECTION SUCCESFULLY!! ")

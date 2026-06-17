@@ -1,10 +1,13 @@
 import { Router } from "express";
-import { getBooks } from "../controllers/book.controller";
+import bookRouter from "./book.route";
+import authRouter from "./user.route";
+
 
 const routes = Router()
 
 
-routes.use("books", getBooks)
+routes.use("/books", bookRouter)
+routes.use("/auth", authRouter)
 
 
 

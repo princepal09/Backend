@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import { AuthRequest, IResponse } from "../utils/types.js";
 import User from "../models/user.model.js";
 import { generateToken } from "../utils/utils.js";
+import cloudinary from "../config/cloudinary.config.js";
 
 export const signup = async (req: Request, res: Response) => {
   try {
@@ -135,7 +136,7 @@ export const logout = async (req: Request, res: Response) => {
 
 export const updateProfile = async (req: AuthRequest, res: Response) => {
   try {
-  const {profilePic } = req.body;
+    const { profilePic } = req.body;
     if (!profilePic) {
       return res.status(400).json({
         success: false,
@@ -145,10 +146,18 @@ export const updateProfile = async (req: AuthRequest, res: Response) => {
 
     const userId = req.user._id;
 
-    
+    const uploadResponse = await cloudinary.uploader.upload(profilePic, {folder : "ChatApp"});
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { profilePic: uploadResponse.secure_url },
+      { returnDocument: "after" },
+    );
 
-
-
+    return res.json(200).json({
+      success : true,
+      message : "Profile Updated Successfully!!",
+      data : updatedUser
+    })
 
   } catch (err: any) {
     console.log("ERROR IN UPDATE PROFILE CONTROLLER", err.message);

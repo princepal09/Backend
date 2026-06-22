@@ -168,3 +168,22 @@ export const updateProfile = async (req: AuthRequest, res: Response) => {
     } as IResponse);
   }
 };
+
+export const checkAuth = async (req: AuthRequest, res: Response) => {
+  try{
+
+    return res.status(200).json({
+      success : true,
+      message : "CHECK AUTH SUCCESSFULLY",
+      data : req.user
+    }as IResponse)
+
+  }catch (err: any) {
+      console.log("ERROR IN CHECK AUTH CONTROLLER", err.message);
+  
+      return res.status(500).json({
+        success: false,
+        message: "INTERNAL SERVER ERROR",
+      } as IResponse);
+    }
+}

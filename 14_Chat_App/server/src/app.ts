@@ -3,6 +3,7 @@ import cookiParser from 'cookie-parser'
 import cors from 'cors'
 const app:Express =  express()
 import authRoutes from './routes/auth.route.js'
+import messageRoutes from './routes/message.route.js'
 
 
 app.use(express.json());
@@ -16,6 +17,7 @@ app.use(cors({
 //routes
 
 app.use("/api/v1/auth", authRoutes)
+app.use("/api/v1/messages", messageRoutes)
 
 app.get('/', (req:Request, res:Response) => {
     return res.json({

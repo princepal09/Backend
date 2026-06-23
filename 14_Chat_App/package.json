@@ -1,0 +1,8 @@
+{
+  "devDependencies": {
+    "concurrently": "^10.0.3"
+  },
+  "scripts": {
+    "dev": "concurrently --names \"CLIENT,SERVER\" --prefix-colors \"blue,green\" \"npm run dev --prefix client\" \"npm run dev --prefix server\""
+  }
+}

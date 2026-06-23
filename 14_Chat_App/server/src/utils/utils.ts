@@ -7,6 +7,8 @@ export const generateToken = (userId : string, res :Response ) =>{
               expiresIn : "7d"
        })
 
+       console.log("token in signup", token)
+
        res.cookie("jwt", token, {
               httpOnly : true, // prevent from cookie access from js  XSS ATTACK 
               maxAge : 7 * 24 * 60 * 60 * 1000, // 7d

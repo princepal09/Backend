@@ -70,6 +70,35 @@ export const getMessages = async (req: AuthRequest, res: Response) => {
 
 export const sendMessage = async (req: AuthRequest, res: Response) => {
   try {
+    const{text, image} = req.body;
+    const{id:recieverId} = req.params;
+    const senderId = req.user._id;
+
+    let imageUrl;
+
+    if(image){
+      const uploadResponse =  await cloudinary.uploader.upload(image, {folder:"ChatApp"});
+      imageUrl = uploadResponse.secure_url;
+    }
+
+    const newMessage = new Message({
+      senderId,
+      recieverId,
+      text, 
+      image : imageUrl
+    })
+
+    await newMessage.save();
+
+    //TODO : IMPLEMENT SOCKET IO TO SEND MESSAGE TO RECIEVER FOR RELATIVE PATH;
+
+    return res.status(200).json({
+      success : true,
+      message : "Send Message Successfully!",
+      data :newMessage
+    })
+
+
   } catch (err: any) {
     console.log("ERROR IN sendMessage  CONTROLLER", err.message);
 

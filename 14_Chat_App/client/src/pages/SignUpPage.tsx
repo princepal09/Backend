@@ -8,18 +8,16 @@ import {
   MessageSquare,
   User,
 } from "lucide-react";
-import toast from "react-hot-toast";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Link } from "react-router-dom";
 import AuthImagePattern from "../components/AuthImagePattern";
-import { apiConnector } from "../services/apiConnector";
-import { auth } from "../services/apis";
-``
+import { IAuthStore, useAuthStore } from "../store/authStore";
+``;
 interface FormData {
   fullName: string;
   email: string;
   password: string;
-}   
+}
 
 const SignUpPage = () => {
   const {
@@ -29,24 +27,13 @@ const SignUpPage = () => {
     formState: { errors, isSubmitting },
   } = useForm<FormData>();
 
+ const signup = useAuthStore((state) => state.signup);
+
   const [showPwd, setShowPwd] = useState(false);
 
   const submitHandle: SubmitHandler<FormData> = async (data) => {
-    try {
-      console.log(data);
-      const response = await apiConnector("POST", auth.SIGNUP_API, data);
-      if (!response) {
-        toast.error("No response from server");
-      }
-
-      console.log(response.data.data);
-      toast.success("Account created successfully!");
-        } catch (error) {
-        console.log(error);
-      toast.error("Something went wrong!");
-    }finally{
-        reset()
-    }
+    await signup(data);
+    reset();
   };
 
   return (
@@ -97,7 +84,9 @@ const SignUpPage = () => {
               </div>
 
               {errors.fullName && (
-                <p className="text-error text-sm mt-1">{errors.fullName.message}</p>
+                <p className="text-error text-sm mt-1">
+                  {errors.fullName.message}
+                </p>
               )}
             </div>
 

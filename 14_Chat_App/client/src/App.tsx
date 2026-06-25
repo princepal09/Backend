@@ -1,22 +1,63 @@
-import { Navigate, Route, Routes } from "react-router-dom"
-import HomePage from "./pages/HomePage"
-import SignUpPage from "./pages/SignUpPage"
-import LoginPage from "./pages/LoginPage"
-import SettingsPage from "./pages/SettingsPage"
-import ProfilePage from "./pages/ProfilePage"
+import { Route, Routes } from "react-router-dom";
+import HomePage from "./pages/HomePage";
+import SignUpPage from "./pages/SignUpPage";
+import LoginPage from "./pages/LoginPage";
+import SettingsPage from "./pages/SettingsPage";
+import ProfilePage from "./pages/ProfilePage";
+import OpenRoute from "./components/Auth/OpenRoute";
+import ProtectedRoute from "./components/Auth/ParivateRoute";
+import { useEffect } from "react";
+import { useAuthStore } from "./store/authStore";
 
 const App = () => {
-  let authUser = false;
-  return (
-   <Routes>
-    <Route path="/" element = {authUser ? <HomePage/> : <Navigate to={'/login'}/>}/>
-    <Route path="/signup" element = {!authUser ? <SignUpPage/> : <Navigate to={'/'}/>}/>
-    <Route path="/login" element = {!authUser ? <LoginPage/> : <Navigate to={'/'}/>}/>
-    <Route path="/settings" element={<SettingsPage/>}/>
-    <Route path="/profile" element = {authUser ? <ProfilePage/> : <Navigate to={'/login'}/>}/>
+  const checkAuth = useAuthStore((state) => state.checkAuth);
 
-   </Routes>
-  )
-}
+  useEffect(() => {
+    console.log("HELLOOOOO")
+    checkAuth();
+  }, []);
+
+  return (
+    <Routes>
+      <Route
+        path="/"
+        element={
+          <ProtectedRoute>
+            <HomePage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <ProfilePage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/login"
+        element={
+          <OpenRoute>
+            <LoginPage />
+          </OpenRoute>
+        }
+      />
+
+      <Route
+        path="/signup"
+        element={
+          <OpenRoute>
+            <SignUpPage />
+          </OpenRoute>
+        }
+      />
+
+      <Route path="/settings" element={<SettingsPage />} />
+    </Routes>
+  );
+};
 
 export default App;

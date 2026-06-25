@@ -1,21 +1,23 @@
+import { AxiosHeaders, Method } from "axios";
 import axios from "axios";
 
 export const axiosInstance = axios.create({
     withCredentials : true
 });
 
+
 export const apiConnector = (
-  method: string,
+  method: Method,
   url: string,
-  data?: any,
-  headers = {},
-  params = {},
+  bodyData?: unknown,
+  headers? : AxiosHeaders,
+  params?: Record<string, any>
 ) => {
   return axiosInstance({
-    method,
+    method ,
     url,
-    data,
-    headers,
-    params,
+    data : bodyData,
+    headers ,
+    params 
   });
 };

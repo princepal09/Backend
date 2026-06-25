@@ -11,6 +11,7 @@ import toast from "react-hot-toast";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Link } from "react-router-dom";
 import AuthImagePattern from "../components/AuthImagePattern";
+import { useAuthStore } from "../store/authStore";
 
 interface FormData {
   email: string;
@@ -26,18 +27,11 @@ const LoginPage = () => {
   } = useForm<FormData>();
 
   const [showPwd, setShowPwd] = useState(false);
+  const login = useAuthStore((state) => state.login)
 
   const submitHandle: SubmitHandler<FormData> = async (data) => {
-    try {
-      console.log(data);
-
-      // Your login API call goes here
-
-      toast.success("Logged in successfully!");
-      reset();
-    } catch (error) {
-      toast.error("Something went wrong!");
-    }
+     await login(data)
+     reset();
   };
 
   return (

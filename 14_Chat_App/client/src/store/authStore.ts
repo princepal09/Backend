@@ -12,6 +12,7 @@ const {
   AUTH_CHECK_API,
 } = auth;
 
+
 export interface IAuthStore {
   authUser: any;
   isSigningUp: boolean;

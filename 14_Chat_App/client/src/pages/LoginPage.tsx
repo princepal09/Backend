@@ -7,7 +7,6 @@ import {
   Mail,
   MessageSquare,
 } from "lucide-react";
-import toast from "react-hot-toast";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Link } from "react-router-dom";
 import AuthImagePattern from "../components/AuthImagePattern";

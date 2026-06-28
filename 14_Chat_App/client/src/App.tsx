@@ -8,55 +8,59 @@ import OpenRoute from "./components/Auth/OpenRoute";
 import ProtectedRoute from "./components/Auth/ParivateRoute";
 import { useEffect } from "react";
 import { useAuthStore } from "./store/authStore";
+import Navbar from "./components/Navbar";
 
 const App = () => {
   const checkAuth = useAuthStore((state) => state.checkAuth);
 
   useEffect(() => {
-    console.log("HELLOOOOO")
+    console.log("HELLOOOOO");
     checkAuth();
   }, []);
 
   return (
-    <Routes>
-      <Route
-        path="/"
-        element={
-          <ProtectedRoute>
-            <HomePage />
-          </ProtectedRoute>
-        }
-      />
+    <>
+      <Navbar />
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <HomePage />
+            </ProtectedRoute>
+          }
+        />
 
-      <Route
-        path="/profile"
-        element={
-          <ProtectedRoute>
-            <ProfilePage />
-          </ProtectedRoute>
-        }
-      />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
 
-      <Route
-        path="/login"
-        element={
-          <OpenRoute>
-            <LoginPage />
-          </OpenRoute>
-        }
-      />
+        <Route
+          path="/login"
+          element={
+            <OpenRoute>
+              <LoginPage />
+            </OpenRoute>
+          }
+        />
 
-      <Route
-        path="/signup"
-        element={
-          <OpenRoute>
-            <SignUpPage />
-          </OpenRoute>
-        }
-      />
+        <Route
+          path="/signup"
+          element={
+            <OpenRoute>
+              <SignUpPage />
+            </OpenRoute>
+          }
+        />
 
-      <Route path="/settings" element={<SettingsPage />} />
-    </Routes>
+        <Route path="/settings" element={<SettingsPage />} />
+      </Routes>
+    </>
   );
 };
 
